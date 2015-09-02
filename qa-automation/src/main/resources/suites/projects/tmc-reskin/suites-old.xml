@@ -1,0 +1,15 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="Smoke Testing" verbose="1">
+	<listeners>
+		<!-- <listener class-name="org.uncommons.reportng.HTMLReporter"></listener> 
+			<listener class-name="org.uncommons.reportng.JUnitXMLReporter"></listener> -->
+	</listeners>
+	<test name="Selenium Tests">
+		<packages>
+			<!-- <package name="com.peoplenet.qa.selenium.tests.old" /> -->
+		</packages>
+		<classes>
+			<class name="com.peoplenet.qa.selenium.tests.old.Add_Client_Group_Testcase56" />
+		</classes>
+	</test>
+</suite>
