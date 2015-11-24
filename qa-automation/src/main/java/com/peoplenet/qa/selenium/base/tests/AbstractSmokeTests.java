@@ -5,10 +5,10 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Alert;
@@ -18,10 +18,16 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.seleniumhq.selenium.fluent.FluentSelect;
+import org.seleniumhq.selenium.fluent.FluentWebDriver;
+import org.seleniumhq.selenium.fluent.FluentWebElement;
+import org.seleniumhq.selenium.fluent.FluentWebElements;
 import org.testng.annotations.Test;
 
 import com.peoplenet.qa.selenium.data.AccessConfig;
+import com.peoplenet.qa.selenium.data.ExcelUtils;
 import com.peoplenet.qa.selenium.data.SuiteConfig;
+import com.peoplenet.qa.selenium.db.config.DatabaseFactory;
 import com.peoplenet.qa.selenium.factory.PropertiesLoader;
 import com.peoplenet.qa.selenium.factory.SeleniumDriverFactory;
 import com.peoplenet.qa.selenium.listeners.ScreenshotListener;
@@ -43,7 +49,8 @@ public abstract class AbstractSmokeTests extends SeleniumDriverFactory {
 	public static WebDriver driver;
 	protected static final Logger log = Logger.getLogger("AbstractSmokeTests");
 	protected static final SimpleDateFormat formatData = new SimpleDateFormat(
-			"MM/dd/yyyy-HHmmss");
+			"MM/dd/yyyy-HH-mm-ss");
+	public static AccessConfig config;
 
 	/**
 	 * <pre>
@@ -53,10 +60,20 @@ public abstract class AbstractSmokeTests extends SeleniumDriverFactory {
 	 * </pre>
 	 */
 	@Test
-	public abstract void tests();
+	public void tests() {
+		System.out.println("Hi How are you :: " + new Date());
+	}
+
+	public static AccessConfig getConfig() {
+		return AbstractSmokeTests.config;
+	}
+
+	public static void setConfig(AccessConfig config) {
+		AbstractSmokeTests.config = config;
+	}
 
 	/**
-	 * @param suiteConfig
+	 * @param data
 	 * @param logoff
 	 * @return WebDriver
 	 * 
@@ -68,32 +85,58 @@ public abstract class AbstractSmokeTests extends SeleniumDriverFactory {
 	 *         }
 	 * </pre>
 	 */
-	protected WebDriver registerAndLogin(SuiteConfig suiteConfig, boolean logoff) {
-		WebDriver driver = null;
+	protected WebDriver registerAndLogin(SuiteConfig data, boolean logoff,
+			Map<String, String> inputValues, WebDriver driver) {
 		try {
-			AccessConfig data = null;
+			AccessConfig conf = null;
 			for (AccessConfig accessConf : accessConfig) {
-				if (suiteConfig.getScript().equals(accessConf.getScript())) {
-					data = accessConf;
-				} else if (accessConf.getScript().equals("Default")) {
-					data = accessConf;
+				if (data.getProject() != null) {
+					if (accessConf.getScript()
+							.equals("URL_" + ExcelUtils.sheet)) {
+						conf = accessConf;
+					} else {
+						if (accessConf.getScript().equals("Default"))
+							conf = accessConf;
+					}
 				}
 			}
-			if (data != null) {
-				driver = getDriver(suiteConfig.getUniqueScript());
-				driver.get(data.getURL());
+			setConfig(conf);
+			if (conf != null) {
+				if (driver == null) {
+					driver = getDriver(data.getUniqueScript());
+					if (!Boolean.valueOf(PropertiesLoader
+							.getProperty("mobileView")))
+						driver.manage().window().maximize();
+				}
+				driver.get(conf.getURL());
+
 				userid = driver.findElement(By.id("UserID"));
 				password = driver.findElement(By.id("Password"));
 				submit = driver.findElement(By.id("SignIn"));
-
-				userid.clear();
-				userid.sendKeys(data.getLogin());
-				password.clear();
-				password.sendKeys(data.getPasword());
-				takeScreenShots("registerAndLogin", suiteConfig.getGroup(),
-						driver);
+				if (inputValues != null) {
+					if (Boolean.valueOf(inputValues.get("addEmployee"))) {
+						userid.clear();
+						userid.sendKeys(conf.getLogin());
+						password.clear();
+						password.sendKeys(conf.getPasword());
+						takeScreenShots("registerAndLogin", data.getGroup(),
+								driver);
+					} else {
+						userid.clear();
+						userid.sendKeys(inputValues.get("userId"));
+						password.clear();
+						password.sendKeys(inputValues.get("password"));
+						takeScreenShots("registerAndLogin", data.getGroup(),
+								driver);
+					}
+				} else {
+					userid.clear();
+					userid.sendKeys(conf.getLogin());
+					password.clear();
+					password.sendKeys(conf.getPasword());
+					takeScreenShots("registerAndLogin", data.getGroup(), driver);
+				}
 				submit.click();
-
 				String parentHandle = driver.getWindowHandle();
 				log.info("parentHandle: " + parentHandle);
 				Thread.sleep(2000);
@@ -115,66 +158,8 @@ public abstract class AbstractSmokeTests extends SeleniumDriverFactory {
 		}
 	}
 
-	/**
-	 * @param suiteConfig
-	 * @param logoff
-	 * @return WebDriver
-	 * 
-	 *         <pre>
-	 * {@code
-	 *         This Method logins into the specified URL from AccessConfig Model
-	 *         loaded from Excel Sheet and logs-off if enabled logoff param as
-	 *         true and finally returns the Driver object with current URL especially used for 'Harmony' Angular JS Version
-	 *         }
-	 * </pre>
-	 */
-	protected WebDriver registerAndLoginHMY(SuiteConfig suiteConfig,
-			boolean logoff) {
-		WebDriver driver = null;
-		try {
-			AccessConfig data = null;
-			for (AccessConfig accessConf : accessConfig) {
-				if (suiteConfig.getScript().equals(accessConf.getScript())) {
-					data = accessConf;
-				} else if (accessConf.getScript().equals("Default_AJ")) {
-					data = accessConf;
-				}
-			}
-			if (data != null) {
-				driver = getDriver(suiteConfig.getUniqueScript());
-				driver.manage().window().maximize();
-				driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-				driver.get(data.getURL());
-
-				userid = driver.findElement(By.id("id"));
-				submit = driver
-						.findElement(By
-								.xpath("//div[@class='row'][1]/form/div//button[@type='submit']"));
-				userid.clear();
-				userid.sendKeys(data.getLogin().split("=")[1]);
-				takeScreenShots("registerAndLoginHMY", suiteConfig.getGroup(),
-						driver);
-				submit.click();
-
-				String parentHandle = driver.getWindowHandle();
-				log.info("parentHandle: " + parentHandle);
-				Thread.sleep(2000);
-				for (String winHandle : driver.getWindowHandles()) {
-					driver.switchTo().window(winHandle);
-					log.info("winHandle: " + winHandle);
-				}
-				Thread.sleep(1000);
-				if (logoff)
-					logOffAndClose(driver, parentHandle);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		if (driver == null) {
-			return getDefaultDriver();
-		} else {
-			return driver;
-		}
+	protected WebDriver registerAndLogin(SuiteConfig suiteConfig, boolean logoff) {
+		return registerAndLogin(suiteConfig, logoff, null, null);
 	}
 
 	/**
@@ -220,193 +205,387 @@ public abstract class AbstractSmokeTests extends SeleniumDriverFactory {
 	 *         }
 	 * </pre>
 	 */
-	protected boolean AddEmployee(SuiteConfig data,
+	protected Map<String, Object> AddEmployee(SuiteConfig data,
 			Map<String, String> inputValues) {
 		WebDriver driver = registerAndLogin(data, false);
+		boolean state = false;
+		Map<String, Object> values = new HashMap<String, Object>();
+		Map<String, FluentWebElement> clientsMap = new HashMap<String, FluentWebElement>();
 		try {
-			takeScreenShots("/AddEmployee/addAnEmployee", data.getGroup(),
-					driver);
+			FluentWebDriver fluent = new FluentWebDriver(driver);
+			takeScreenShots("/" + data.getScript() + "/TimeEntry/screenshot",
+					data.getGroup(), driver);
 			log.info("Input Values : " + inputValues);
-			if (getFrameElement(driver, "Table") != null) {
-				// Find an Employee
-				driver.switchTo().frame(getFrameElement(driver, "Table"));
-				driver.findElement(
-						By.xpath("//a[contains(text(),'"
-								+ inputValues.get("client") + "')]")).click();
-				Thread.sleep(1000);
-				driver.switchTo().frame(getFrameElement(driver, "Table"));
-				getLinkElement(driver, inputValues.get("group")).click();
-				takeScreenShots("/AddEmployee/addAnEmployee", data.getGroup(),
-						driver);
-				driver.switchTo().frame(getFrameElement(driver, "Table"));
-				getLinkElement(driver, inputValues.get("site")).click();
-				takeScreenShots("/AddEmployee/addAnEmployee", data.getGroup(),
-						driver);
-				if (getFrameElement(driver, "Menu") != null) {
-					driver.switchTo().frame(getFrameElement(driver, "Menu"));
-
-					Select select = new Select(driver.findElement(By
-							.name("Maintenance")));
-					select.selectByVisibleText("Employee Setup");
-					Robot robot = new Robot();
-
-					robot.keyPress(KeyEvent.VK_ENTER);
-					robot.keyRelease(KeyEvent.VK_ENTER);
-
-					Thread.sleep(500);
+			Thread.sleep(8000);
+			driver.switchTo().frame("Table");
+			// Find an Employee
+			FluentWebElements clients = fluent.links(By.xpath("contains(.,'"
+					+ inputValues.get("client") + "')"));// *[@id="ClientListTable"]/tbody/tr[287]/td[3]/span[1]/a
+			for (FluentWebElement client : clients) {
+				if (client.isDisplayed().value() && client.isEnabled().value()) {
+					clientsMap.put(client.getText().toString(), client);
 				}
-				if (getFrameElement(driver, "Navigation") != null) {
-					// Add an Employee
-					driver.switchTo().frame(
-							getFrameElement(driver, "Navigation"));
+			}
+			FluentWebElement clientClick = clientsMap.get(inputValues
+					.get("client"));
+			clientClick.click();
+			Thread.sleep(3000);
+			driver.switchTo().frame("Table");
+			FluentWebElement group = fluent.link(By.xpath("contains(.,'"
+					+ inputValues.get("group") + "')"));
+			if (group.isDisplayed().value() && group.isEnabled().value()) {
+				group.click();
+				takeScreenShots("/" + data.getScript()
+						+ "/TimeEntry/screenshot", data.getGroup(), driver);
+				Thread.sleep(4000);
+				if (data.getProject().equals("TMC")) {
+					if (getFrameElement(driver, "Menu") != null) {
+						driver.switchTo()
+								.frame(getFrameElement(driver, "Menu"));
+						Thread.sleep(3000);
+						Select select = new Select(driver.findElement(By
+								.name("Maintenance")));
+						select.selectByVisibleText("Employee Setup");
+						Robot robot = new Robot();
+
+						robot.keyPress(KeyEvent.VK_ENTER);
+						robot.keyRelease(KeyEvent.VK_ENTER);
+
+						Thread.sleep(500);
+					}
+					if (getFrameElement(driver, "Navigation") != null) {
+						// Add an Employee
+						driver.switchTo().frame(
+								getFrameElement(driver, "Navigation"));
+						takeScreenShots("/" + data.getScript()
+								+ "/TimeEntry/screenshot", data.getGroup(),
+								driver);
+						driver.findElement(By.id("AddEmpButton")).click();
+					}
+					for (String winHandle : driver.getWindowHandles()) {
+						driver.switchTo().window(winHandle);
+						log.info("winHandle: " + winHandle);
+					}
+					Thread.sleep(3000);
+					takeScreenShots("/" + data.getScript()
+							+ "/TimeEntry/screenshot", data.getGroup(), driver);
+					Thread.sleep(2000);
+					driver.findElement(By.name("EmplSSN")).sendKeys(
+							inputValues.get("ssn"));
+					getInputElement(driver, "value", "Next >>").click();
+					Thread.sleep(500);
+					for (String winHandle : driver.getWindowHandles()) {
+						driver.switchTo().window(winHandle);
+						log.info("winHandle: " + winHandle);
+					}
+					Thread.sleep(3000);
+					takeScreenShots("/" + data.getScript()
+							+ "/TimeEntry/screenshot", data.getGroup(), driver);
+					if (getFrameElement(driver, "Main") != null) {
+						// Add an Employee
+						driver.switchTo()
+								.frame(getFrameElement(driver, "Main"));
+						driver.findElement(By.id("LastName")).sendKeys(
+								inputValues.get("lastName"));
+						driver.findElement(By.id("FirstName")).sendKeys(
+								inputValues.get("firstName"));
+
+						Select select = new Select(driver.findElement(By
+								.name("PayType")));
+						select.selectByVisibleText(inputValues.get("payType"));
+						Robot robot = new Robot();
+
+						robot.keyPress(KeyEvent.VK_ENTER);
+						robot.keyRelease(KeyEvent.VK_ENTER);
+						Thread.sleep(500);
+
+						Select select1 = new Select(driver.findElement(By
+								.name("Status")));
+						select1.selectByVisibleText(inputValues.get("status"));
+						Robot robot1 = new Robot();
+
+						robot1.keyPress(KeyEvent.VK_ENTER);
+						robot1.keyRelease(KeyEvent.VK_ENTER);
+
+						Thread.sleep(1500);
+						takeScreenShots("/" + data.getScript()
+								+ "/TimeEntry/screenshot", data.getGroup(),
+								driver);
+
+						driver.findElement(By.id("sitesDepts")).click();
+						Thread.sleep(1500);
+						takeScreenShots("/" + data.getScript()
+								+ "/TimeEntry/screenshot", data.getGroup(),
+								driver);
+						Select select2 = new Select(driver.findElement(By
+								.name("SiteDeptTemplate")));
+						String optionText = "";
+						List<WebElement> options = select2.getOptions();
+						for (WebElement element : options) {
+							if (element.getText() != null
+									&& !element.getText().isEmpty()
+									&& !element.getText().equals(
+											"Select Template")) {
+								optionText = element.getText();
+								break;
+							}
+						}
+						select2.selectByVisibleText(optionText);
+						Robot robot2 = new Robot();
+
+						robot2.keyPress(KeyEvent.VK_ENTER);
+						robot2.keyRelease(KeyEvent.VK_ENTER);
+						Thread.sleep(5000);
+
+						Select select3 = new Select(driver.findElement(By
+								.name("PrimaryDept")));
+						String optionText1 = "";
+						List<WebElement> options1 = select3.getOptions();
+						for (WebElement element : options1) {
+							if (element.getText() != null
+									&& !element.getText().isEmpty()
+									&& !element.getText().equals(
+											"Select Template")) {
+								optionText1 = element.getText();
+								break;
+							}
+						}
+						select3.selectByVisibleText(optionText1);
+						Robot robot3 = new Robot();
+						robot3.keyPress(KeyEvent.VK_ENTER);
+						robot3.keyRelease(KeyEvent.VK_ENTER);
+						Thread.sleep(1500);
+
+						Select select4 = new Select(driver.findElement(By
+								.name("PrimarySite")));
+						String optionText2 = "";
+						List<WebElement> options2 = select4.getOptions();
+						for (WebElement element : options2) {
+							if (element.getText() != null
+									&& !element.getText().isEmpty()
+									&& !element.getText().equals(
+											"Select Template")) {
+								optionText2 = element.getText();
+								break;
+							}
+						}
+						select4.selectByVisibleText(optionText2);
+						Robot robot4 = new Robot();
+						robot4.keyPress(KeyEvent.VK_ENTER);
+						robot4.keyRelease(KeyEvent.VK_ENTER);
+						Thread.sleep(500);
+						takeScreenShots("/AddEmployee/addAnEmployee",
+								data.getGroup(), driver);
+						driver.findElement(By.id("Remove2")).click();
+						Thread.sleep(100);
+						driver.findElement(By.id("Remove3")).click();
+						Thread.sleep(100);
+						driver.findElement(By.id("Remove4")).click();
+						Thread.sleep(100);
+						driver.findElement(By.id("Remove5")).click();
+						takeScreenShots("/AddEmployee/addAnEmployee",
+								data.getGroup(), driver);
+					}
+					Thread.sleep(1000);
+					for (String winHandle : driver.getWindowHandles()) {
+						driver.switchTo().window(winHandle);
+						log.info("winHandle: " + winHandle);
+					}
+					Thread.sleep(1000);
 					takeScreenShots("/AddEmployee/addAnEmployee",
 							data.getGroup(), driver);
-					driver.findElement(By.id("AddEmpButton")).click();
-				}
-				for (String winHandle : driver.getWindowHandles()) {
-					driver.switchTo().window(winHandle);
-					log.info("winHandle: " + winHandle);
-				}
-				takeScreenShots("/AddEmployee/addAnEmployee", data.getGroup(),
-						driver);
-				Thread.sleep(2000);
-				driver.findElement(By.name("EmplSSN")).sendKeys(
-						inputValues.get("ssn"));
-				getInputElement(driver, "value", "Next >>").click();
-				Thread.sleep(500);
-				for (String winHandle : driver.getWindowHandles()) {
-					driver.switchTo().window(winHandle);
-					log.info("winHandle: " + winHandle);
-				}
-				takeScreenShots("/AddEmployee/addAnEmployee", data.getGroup(),
-						driver);
-				if (getFrameElement(driver, "Main") != null) {
-					// Add an Employee
-					driver.switchTo().frame(getFrameElement(driver, "Main"));
-					driver.findElement(By.id("LastName")).sendKeys(
-							inputValues.get("lastName"));
-					driver.findElement(By.id("FirstName")).sendKeys(
-							inputValues.get("firstName"));
-
-					Select select = new Select(driver.findElement(By
-							.name("PayType")));
-					select.selectByVisibleText(inputValues.get("payType"));
+					if (getFrameElement(driver, "Navigation") != null) {
+						driver.switchTo().frame(
+								getFrameElement(driver, "Navigation"));
+						driver.findElement(By.name("save")).click();
+						Thread.sleep(1000);
+					}
+					takeScreenShots("/AddEmployee/addAnEmployee",
+							data.getGroup(), driver);
+					Thread.sleep(1000);
+					driver.quit();
+				} else {
+					driver.switchTo().frame(getFrameElement(driver, "Menu"));
+					Thread.sleep(3000);
+					FluentSelect select = fluent.select(By.name("Maintenance"));
+					select.selectByVisibleText("Administration");
 					Robot robot = new Robot();
 
 					robot.keyPress(KeyEvent.VK_ENTER);
 					robot.keyRelease(KeyEvent.VK_ENTER);
+
 					Thread.sleep(500);
+					takeScreenShots("/" + data.getScript()
+							+ "/TimeEntry/screenshot", data.getGroup(), driver);
 
-					Select select1 = new Select(driver.findElement(By
-							.name("Status")));
-					select1.selectByVisibleText(inputValues.get("status"));
+					for (String winHandle : driver.getWindowHandles()) {
+						driver.switchTo().window(winHandle);
+						log.info("winHandle: " + winHandle);
+					}
+					Thread.sleep(3000);
+					fluent.input(By.id("btnDecline")).click();
+
+					Thread.sleep(3000);
+					for (String winHandle : driver.getWindowHandles()) {
+						driver.switchTo().window(winHandle);
+						log.info("winHandle: " + winHandle);
+					}
+					Thread.sleep(3000);
+
+					driver.switchTo().frame(getFrameElement(driver, "Table"));
+					fluent.link(
+							By.xpath("contains(.,'" + inputValues.get("group")
+									+ " Setup')")).click();
+					Thread.sleep(3000);
+					takeScreenShots("/" + data.getScript()
+							+ "/TimeEntry/screenshot", data.getGroup(), driver);
+
+					// driver.switchTo().frame("Table");
+					driver.findElement(
+							By.xpath("/html/body/form/table[2]/tbody/tr/td/span/a"))
+							.click();
+					Thread.sleep(3000);
+					takeScreenShots("/" + data.getScript()
+							+ "/TimeEntry/screenshot", data.getGroup(), driver);
+
+					if (inputValues.get("client").equals("MANPOWER GROUP")
+							|| inputValues.get("client").equals("CANADA")) {
+						fluent.link(
+								By.xpath("contains(.,'Non-Agency Employees')"))
+								.click();
+						Thread.sleep(1500);
+					}
+					// driver.switchTo().frame("Table");
+					fluent.input(By.className("smallbold")).click();
+					Thread.sleep(3000);
+					takeScreenShots("/" + data.getScript()
+							+ "/TimeEntry/screenshot", data.getGroup(), driver);
+
+					// driver.switchTo().frame(getFrameElement(driver,
+					// "Table"));
+
+					fluent.input(By.name("SSN")).sendKeys(
+							inputValues.get("lastSSN"));
+					Thread.sleep(1500);
+					fluent.input(By.name("FirstName")).sendKeys(
+							inputValues.get("firstName"));
+					Thread.sleep(1500);
+					fluent.input(By.name("LastName")).sendKeys(
+							inputValues.get("lastName"));
+					Thread.sleep(1500);
+					fluent.input(By.name("EmpEmail")).sendKeys(
+							inputValues.get("empEmail"));
+					Thread.sleep(1500);
+					fluent.input(By.name("FileNo")).sendKeys(
+							inputValues.get("empId"));
+					Thread.sleep(1500);
+					FluentSelect timeEntry = fluent.select(By
+							.name("WTE_TimeEntry"));
+					timeEntry.selectByVisibleText("Spreadsheet w/Projects");
 					Robot robot1 = new Robot();
-
 					robot1.keyPress(KeyEvent.VK_ENTER);
 					robot1.keyRelease(KeyEvent.VK_ENTER);
-
+					Thread.sleep(500);
 					Thread.sleep(1500);
-					takeScreenShots("/AddEmployee/addAnEmployee",
-							data.getGroup(), driver);
+					takeScreenShots("/" + data.getScript()
+							+ "/TimeEntry/screenshot", data.getGroup(), driver);
 
-					driver.findElement(By.id("sitesDepts")).click();
-					Thread.sleep(1500);
-					takeScreenShots("/AddEmployee/addAnEmployee",
-							data.getGroup(), driver);
-					Select select2 = new Select(driver.findElement(By
-							.name("SiteDeptTemplate")));
-					String optionText = "";
-					List<WebElement> options = select2.getOptions();
-					for (WebElement element : options) {
-						if (element.getText() != null
-								&& !element.getText().isEmpty()
-								&& !element.getText().equals("Select Template")) {
-							optionText = element.getText();
-							break;
-						}
-					}
-					select2.selectByVisibleText(optionText);
+					FluentSelect clientSel = fluent.select(By.name("SiteNo"));
+					clientSel.selectByVisibleText(inputValues.get("site"));
+
 					Robot robot2 = new Robot();
-
 					robot2.keyPress(KeyEvent.VK_ENTER);
 					robot2.keyRelease(KeyEvent.VK_ENTER);
-					Thread.sleep(5000);
+					Thread.sleep(500);
+					Thread.sleep(1500);
 
-					Select select3 = new Select(driver.findElement(By
-							.name("PrimaryDept")));
-					String optionText1 = "";
-					List<WebElement> options1 = select3.getOptions();
-					for (WebElement element : options1) {
-						if (element.getText() != null
-								&& !element.getText().isEmpty()
-								&& !element.getText().equals("Select Template")) {
-							optionText1 = element.getText();
-							break;
-						}
-					}
-					select3.selectByVisibleText(optionText1);
+					fluent.input(By.name("JobDesc")).sendKeys(
+							"Harmony Responsive Tester");
+					Thread.sleep(1500);
+					fluent.input(By.name("AssignmentNo")).sendKeys("98723425");
+					Thread.sleep(1500);
+					fluent.input(By.name("AssignmentStart")).sendKeys(
+							"01/01/2015");
+					Thread.sleep(1500);
+					fluent.input(By.name("AssignmentEnd")).sendKeys(
+							"12/31/2018");
+					Thread.sleep(1500);
+					fluent.input(By.name("BillRate")).sendKeys("18.00");
+					Thread.sleep(1500);
+					fluent.input(By.name("PayRate")).sendKeys("16.00");
+					Thread.sleep(1500);
+					takeScreenShots("/" + data.getScript()
+							+ "/TimeEntry/screenshot", data.getGroup(), driver);
+
+					FluentSelect stateSel = fluent.select(By.name("workState"));
+					stateSel.selectByVisibleText("GEORGIA");
+
 					Robot robot3 = new Robot();
 					robot3.keyPress(KeyEvent.VK_ENTER);
 					robot3.keyRelease(KeyEvent.VK_ENTER);
+					Thread.sleep(500);
 					Thread.sleep(1500);
 
-					Select select4 = new Select(driver.findElement(By
-							.name("PrimarySite")));
-					String optionText2 = "";
-					List<WebElement> options2 = select4.getOptions();
-					for (WebElement element : options2) {
-						if (element.getText() != null
-								&& !element.getText().isEmpty()
-								&& !element.getText().equals("Select Template")) {
-							optionText2 = element.getText();
-							break;
-						}
+					fluent.input(By.name("ApproverFirstName")).sendKeys(
+							inputValues.get("apprFirstName"));
+					Thread.sleep(1500);
+					fluent.input(By.name("ApproverLastName")).sendKeys(
+							inputValues.get("apprLastName"));
+					Thread.sleep(1500);
+					fluent.input(By.name("ApproverEmail")).sendKeys(
+							inputValues.get("apprEmail"));
+					Thread.sleep(1500);
+
+					takeScreenShots("/" + data.getScript()
+							+ "/TimeEntry/screenshot", data.getGroup(), driver);
+					Thread.sleep(1500);
+					getInputElement(driver, "value", "Save Employee").click();
+					Thread.sleep(12000);
+				}
+				state = true;
+				String currentUrl = driver.getCurrentUrl();
+				if (!currentUrl.contains("qa2-www.mypeoplenet.com")) {
+					Map<String, String> employeeData = checkForEmployee(data,
+							inputValues);
+					if (employeeData != null && !employeeData.isEmpty()) {
+						inputValues.put("userId", employeeData.get("userId"));
+						inputValues.put("recordId",
+								employeeData.get("recordId"));
+						inputValues.put("password",
+								employeeData.get("password"));
 					}
-					select4.selectByVisibleText(optionText2);
-					Robot robot4 = new Robot();
-					robot4.keyPress(KeyEvent.VK_ENTER);
-					robot4.keyRelease(KeyEvent.VK_ENTER);
-					Thread.sleep(500);
-					takeScreenShots("/AddEmployee/addAnEmployee",
-							data.getGroup(), driver);
-					driver.findElement(By.id("Remove2")).click();
-					Thread.sleep(100);
-					driver.findElement(By.id("Remove3")).click();
-					Thread.sleep(100);
-					driver.findElement(By.id("Remove4")).click();
-					Thread.sleep(100);
-					driver.findElement(By.id("Remove5")).click();
-					takeScreenShots("/AddEmployee/addAnEmployee",
-							data.getGroup(), driver);
 				}
-				Thread.sleep(1000);
-				for (String winHandle : driver.getWindowHandles()) {
-					driver.switchTo().window(winHandle);
-					log.info("winHandle: " + winHandle);
-				}
-				Thread.sleep(1000);
-				takeScreenShots("/AddEmployee/addAnEmployee", data.getGroup(),
-						driver);
-				if (getFrameElement(driver, "Navigation") != null) {
-					driver.switchTo().frame(
-							getFrameElement(driver, "Navigation"));
-					driver.findElement(By.name("save")).click();
-					Thread.sleep(1000);
-				}
-				takeScreenShots("/AddEmployee/addAnEmployee", data.getGroup(),
-						driver);
-				Thread.sleep(1000);
+				values.put("status", state);
+				values.put("driver", driver);
+			} else {
+				driver.quit();
 			}
-			driver.quit();
-			return true;
+
 		} catch (Exception e) {
-			takeScreenShots("/AddEmployee/addAnEmployee-error",
+			takeScreenShots("/" + data.getScript() + "/ERROR/screenshot",
 					data.getGroup(), driver);
 			driver.quit();
 			e.printStackTrace();
-			return false;
+		}
+		return values;
+
+	}
+
+	public Map<String, String> checkForEmployee(SuiteConfig data,
+			Map<String, String> inputValues) {
+
+		Map<String, String> employeeData = DatabaseFactory
+				.checkEmployeeCreation(inputValues.get("empEmail"));
+
+		if (employeeData.isEmpty()) {
+			log.info("Employee Not Created = So Skip All and Try Again");
+		} else {
+			log.info("Employee Saved :: " + employeeData);
+			DatabaseFactory.modifyEmployee(inputValues.get("empEmail"),
+					inputValues.get("client"));
 		}
 
+		return employeeData;
 	}
 
 	/**

@@ -1,0 +1,90 @@
+<header ng-switch
+	on="$location.path().indexOf('/MobileConfig/new') > -1">
+	<h3 ng-switch-when="true">Create a new MobileConfig</h3>
+	<h3 ng-switch-when="false">View or edit MobileConfig</h3>
+</header>
+<form id="MobileConfigForm" name="MobileConfigForm"
+	class="form-horizontal" role="form">
+	<div ng-show="displayError" class="alert alert-danger">
+		<strong>Error!</strong> Something broke. Retry, or cancel and start
+		afresh.
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MobileConfigForm.project.$invalid}">
+		<label for="project" class="col-sm-2 control-label">Project</label>
+		<div id='project' class="col-sm-10">
+			<input id="project" name="project" class="form-control" type="text"
+				ng-model="config.project" placeholder="Specify the Project Name"
+				required></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MobileConfigForm.environment.$invalid}">
+		<label for="environment" class="col-sm-2 control-label">Environment</label>
+		<div id="environmentControls" class="col-sm-10">
+			<select id="environment" name="environment" class="form-control"
+				ng-model="environmentSelection" required>
+				<option value="">Choose an Environment</option>
+				<option value="DEV">DEV-Development</option>
+				<option value="QA">QA-Testing</option>
+				<option value="UAT">UAT-UserAcceptance</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MobileConfigForm.buildVersion.$invalid}">
+		<label for="buildVersion" class="col-sm-2 control-label">Build
+			Version</label>
+		<div class="col-sm-10">
+			<input id="buildVersion" name="buildVersion" class="form-control"
+				type="text" ng-model="config.buildVersion"
+				placeholder="Enter the Build Version" required></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MobileConfigForm.platform.$invalid}">
+		<label for="platform" class="col-sm-2 control-label">Platform</label>
+		<div id="platformControls" class="col-sm-10">
+			<select id="platform" name="platform" class="form-control"
+				ng-model="platformSelection" required>
+				<option value="">Choose an Platform for Mobile</option>
+				<option value="android">ANDROID</option>
+				<option value="ios">MAC-iPhone</option>
+				<option value="ipad">MAC-iPad</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MobileConfigForm.deviceName.$invalid}">
+		<label for="deviceName" class="col-sm-2 control-label">Device</label>
+		<div id="deviceNameControls" class="col-sm-10">
+			<input id="deviceName" name="deviceName" type="text"
+				class="form-control" ng-model="config.deviceName"
+				placeholder="Enter the Device Name" required></input>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button id="saveMobileConfig" name="saveMobileConfig"
+				class="btn btn-primary"
+				ng-disabled="isClean() || MobileConfigForm.$invalid"
+				ng-click="save()">
+				<span class="glyphicon glyphicon-ok-sign"></span> Save
+			</button>
+			<button id="cancel" name="cancel" class="btn btn-default"
+				ng-click="cancel()">
+				<span class="glyphicon glyphicon-remove-sign"></span> Cancel
+			</button>
+			<button id="deleteMobileConfig" name="deleteMobileConfig"
+				class="btn btn-danger" ng-show="MobileConfig.id" ng-click="remove()">
+				<span class="glyphicon glyphicon-trash"></span> Delete
+			</button>
+		</div>
+	</div>
+</form>

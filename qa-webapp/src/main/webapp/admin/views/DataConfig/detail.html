@@ -1,0 +1,151 @@
+<header ng-switch on="$location.path().indexOf('/DataConfig/new') > -1">
+	<h3 ng-switch-when="true">Create a new Data Configuration</h3>
+	<h3 ng-switch-when="false">View or edit Data</h3>
+</header>
+<form id="DataConfigForm" name="DataConfigForm" class="form-horizontal"
+	role="form">
+	<div ng-show="displayError" class="alert alert-danger">
+		<strong>Error!</strong> Something broke. Retry, or cancel and start
+		afresh.
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataConfigForm.project.$invalid}">
+		<label for="project" class="col-sm-2 control-label">Project</label>
+		<div id='project' class="col-sm-10">
+			<input id="project" name="project" class="form-control" type="text"
+				ng-model="config.project" placeholder="Specify the Project Name"
+				required></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataConfigForm.environment.$invalid}">
+		<label for="environment" class="col-sm-2 control-label">Environment</label>
+		<div id="environmentControls" class="col-sm-10">
+			<select id="environment" name="environment" class="form-control"
+				ng-model="environmentSelection" required>
+				<option value="">Choose an Environment</option>
+				<option value="DEV">DEV-Development</option>
+				<option value="QA">QA-Testing</option>
+				<option value="UAT">UAT-UserAcceptance</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataConfigForm.buildVersion.$invalid}">
+		<label for="buildVersion" class="col-sm-2 control-label">Build
+			Version</label>
+		<div class="col-sm-10">
+			<input id="buildVersion" name="buildVersion" class="form-control"
+				type="text" ng-model="config.buildVersion"
+				placeholder="Enter the Build Version" required></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataConfigForm.scriptName.$invalid}">
+		<label for="scriptName" class="col-sm-2 control-label">Script
+			Name</label>
+		<div id="scriptNameControls" class="col-sm-10">
+			<input id="scriptName" name="scriptName" type="text" required
+				ng-maxlength="26" ng-minlength="8" class="form-control"
+				ng-model="config.scriptName" placeholder="Enter the Script Name"></input>
+			<span class="help-block error"
+				ng-show="DataConfigForm.scriptName.$error.required">required</span>
+			<span class="help-block error"
+				ng-show="DataConfigForm.scriptName.$error.minlength">minimum
+				length is 8</span> <span class="help-block error"
+				ng-show="DataConfigForm.scriptName.$error.maxlength">maximum
+				length is 26</span>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataConfigForm.userType.$invalid}">
+		<label for="userType" class="col-sm-2 control-label">User Type</label>
+		<div id="userTypeControls" class="col-sm-10">
+			<input id="userType" name="userType" type="text" required
+				ng-maxlength="26" ng-minlength="3" class="form-control"
+				ng-model="config.userType" placeholder="Enter the UserType "></input>
+			<span class="help-block error"
+				ng-show="DataConfigForm.userType.$error.required">required</span> <span
+				class="help-block error"
+				ng-show="DataConfigForm.userType.$error.minlength">minimum
+				length is 3</span> <span class="help-block error"
+				ng-show="DataConfigForm.userType.$error.maxlength">maximum
+				length is 26</span>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataConfigForm.mobileView.$invalid}">
+		<label for="mobileView" class="col-sm-2 control-label">Mobile
+			Test</label>
+		<div id="mobileView" class="col-sm-10">
+			<input id="mobileView" name="mobileView" type="checkbox"
+				class="form-control" style="width: 10%" ng-model="config.mobileView"
+				placeholder="Enable/Disable Execution on Mobile Device"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataConfigForm.browser.$invalid}">
+		<label for="browser" class="col-sm-2 control-label">Browser</label>
+		<div id="browserControls" class="col-sm-10">
+			<select id="browser" name="browser" class="form-control"
+				ng-model="browserSelection" required>
+				<option value="Chrome">Chrome</option>
+				<option value="Firefox">Firefox</option>
+				<option value="InternetExplorer">Internet Explorer</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataConfigForm.status.$invalid}">
+		<label for="status" class="col-sm-2 control-label">Run Status</label>
+		<div id="status" class="col-sm-10">
+			<input id="status" name="status" type="checkbox" class="form-control"
+				style="width: 10%" ng-model="config.status"
+				placeholder="Enable/Disable Script Execution"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataConfigForm.description.$invalid}">
+		<label for="description" class="col-sm-2 control-label">Description</label>
+		<div id="descriptionControls" class="col-sm-10">
+			<input id="description" name="description" type="text" required
+				ng-maxlength="1000" ng-minlength="20" class="form-control"
+				ng-model="config.description"
+				placeholder="Enter the Event Description"></input> <span
+				class="help-block error"
+				ng-show="DataConfigForm.description.$error.required">required</span>
+			<span class="help-block error"
+				ng-show="DataConfigForm.description.$error.minlength">minimum
+				length is 20</span> <span class="help-block error"
+				ng-show="DataConfigForm.description.$error.maxlength">maximum
+				length is 1000</span>
+		</div>
+	</div>
+
+
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button id="saveEvent" name="saveEvent" class="btn btn-primary"
+				ng-disabled="isClean() || DataConfigForm.$invalid" ng-click="save()">
+				<span class="glyphicon glyphicon-ok-sign"></span> Save
+			</button>
+			<button id="cancel" name="cancel" class="btn btn-default"
+				ng-click="cancel()">
+				<span class="glyphicon glyphicon-remove-sign"></span> Cancel
+			</button>
+			<button id="deleteEvent" name="deleteEvent" class="btn btn-danger"
+				ng-show="event.id" ng-click="remove()">
+				<span class="glyphicon glyphicon-trash"></span> Delete
+			</button>
+		</div>
+	</div>
+</form>

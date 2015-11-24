@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="HMY Smoke Testing" verbose="1">
+	<test name="HMY Selenium Tests">
+		<packages>
+			<package name="com.peoplenet.qa.selenium.tests.hmy" />
+		</packages>
+	</test>
+</suite>

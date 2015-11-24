@@ -4,8 +4,10 @@
 </head>
 <body style="color: #2F6A79">
 <div>
-<img src="http://www.mypeoplenet.com/Images/PeopleNet-logo.png"/><h2 style="text-align: left;color: #2F6A79;margin: 2px;padding : 2px;">Selenium SmokeTests Reports Total No : ${count}</h2>
+<img src="http://www.mypeoplenet.com/Images/PeopleNet-logo.png"/><h2 style="text-align: left;color: #2F6A79;margin: 2px;padding : 2px;">Selenium SmokeTests Reports</h2><br/>
+<h2 style="text-align: left;color: #2F6A79;margin: 2px;padding : 2px;">Total Script Flows : ${count} [Functionality Covered : ${functionality}; Scenarios Covered : ${scenarios}]</h2>
 </div>
+<br/>
 <div>
 <table style="border: 1px solid black;border-collapse: collapse; width: 800px;">
 <thead style="background-color: #00B4E9;color: #ffffff;border: 1px solid black;border-collapse: collapse;">
@@ -14,6 +16,7 @@
      <th style="border: 1px solid black;border-collapse: collapse;padding: 5px;">Passed</th>
      <th style="border: 1px solid black;border-collapse: collapse;padding: 5px;">Failed</th>
      <th style="border: 1px solid black;border-collapse: collapse;padding: 5px;">Skipped</th>
+     <th style="border: 1px solid black;border-collapse: collapse;padding: 5px;">Total</th>
   </tr>
 </thead>
 <tbody>

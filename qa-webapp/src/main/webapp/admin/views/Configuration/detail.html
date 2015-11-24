@@ -1,0 +1,129 @@
+<header ng-switch
+	on="$location.path().indexOf('/Configuration/new') > -1">
+	<h3 ng-switch-when="true">Create a new Configuration</h3>
+	<h3 ng-switch-when="false">View or edit Configuration</h3>
+</header>
+<form id="ConfigForm" name="ConfigForm" class="form-horizontal"
+	role="form">
+	<div ng-show="displayError" class="alert alert-danger">
+		<strong>Error!</strong> Something broke. Retry, or cancel and start
+		afresh.
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': ConfigForm.project.$invalid}">
+		<label for="project" class="col-sm-2 control-label">Project</label>
+		<div id='project' class="col-sm-10">
+			<input id="project" name="project" class="form-control" type="text"
+				ng-model="config.id.project" placeholder="Specify the Project Name"
+				required></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': ConfigForm.environment.$invalid}">
+		<label for="environment" class="col-sm-2 control-label">Environment</label>
+		<div id="environmentControls" class="col-sm-10">
+			<select id="environment" name="environment" class="form-control"
+				ng-model="environmentSelection" required>
+				<option value="">Choose an Environment</option>
+				<option value="DEV">DEV-Development</option>
+				<option value="QA">QA-Testing</option>
+				<option value="UAT">UAT-UserAcceptance</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': ConfigForm.buildVersion.$invalid}">
+		<label for="buildVersion" class="col-sm-2 control-label">Build
+			Version</label>
+		<div class="col-sm-10">
+			<input id="buildVersion" name="buildVersion" class="form-control"
+				type="text" ng-model="config.id.buildVersion"
+				placeholder="Enter the Build Version" required></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': ConfigForm.testResultsDir.$invalid}">
+		<label for="testResultsDir" class="col-sm-2 control-label">Result
+			Directory</label>
+		<div id='testResultsDir' class="col-sm-10">
+			<input id="testResultsDir" name="testResultsDir" class="form-control"
+				type="text" ng-model="config.testResultsDir"
+				placeholder="Specify the Test Results Dir"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': ConfigForm.emailReports.$invalid}">
+		<label for="emailReports" class="col-sm-2 control-label">Email
+			Reports</label>
+		<div id="emailReports" class="col-sm-10">
+			<input id="emailReports" name="emailReports" type="checkbox"
+				class="form-control" style="width: 10%"
+				ng-model="config.emailReports"
+				placeholder="Enable/Disable Emailing Reports"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': ConfigForm.emailReports.$invalid}">
+		<label for="remoteDriver" class="col-sm-2 control-label">Remote
+			Executions</label>
+		<div id="remoteDriver" class="col-sm-10">
+			<input id="remoteDriver" name="remoteDriver" type="checkbox"
+				class="form-control" style="width: 10%"
+				ng-model="config.remoteDriver"
+				placeholder="Enable/Disable Remote Execution" ng-change="ShowHide()"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': ConfigForm.remoteUser.$invalid}"
+		ng-show="IsVisible">
+		<label for="remoteUser" class="col-sm-2 control-label">Remote
+			User</label>
+		<div id='remoteUser' class="col-sm-10">
+			<input id="remoteUser" name="remoteUser" class="form-control"
+				type="text" ng-model="config.remoteUser"
+				placeholder="Specify the Remote Username"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': ConfigForm.remoteKey.$invalid}"
+		ng-show="IsVisible">
+		<label for="remoteKey" class="col-sm-2 control-label">Remote
+			Key</label>
+		<div id='remoteKey' class="col-sm-10">
+			<input id="remoteKey" name="remoteKey" class="form-control"
+				type="text" ng-model="config.remoteKey"
+				placeholder="Specify the Remote Key for Authorization"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': ConfigForm.timeWait.$invalid}">
+		<label for="timeWait" class="col-sm-2 control-label">Time Wait</label>
+		<div id='timeWait' class="col-sm-10">
+			<input id="timeWait" name="timeWait" class="form-control" type="text"
+				ng-model="config.timeWait"
+				placeholder="Specify the Waiting time in millis"></input>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button id="save" name="save" class="btn btn-primary"
+				ng-disabled="isClean() || ConfigForm.$invalid" ng-click="save()">
+				<span class="glyphicon glyphicon-ok-sign"></span> Save
+			</button>
+			<button id="cancel" name="cancel" class="btn btn-default"
+				ng-click="cancel()">
+				<span class="glyphicon glyphicon-remove-sign"></span> Cancel
+			</button>
+		</div>
+	</div>
+</form>

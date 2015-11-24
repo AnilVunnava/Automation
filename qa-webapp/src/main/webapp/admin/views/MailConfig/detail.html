@@ -1,0 +1,132 @@
+<header ng-switch on="$location.path().indexOf('/MailConfig/new') > -1">
+	<h3 ng-switch-when="true">Create a new Mail Configuration</h3>
+	<h3 ng-switch-when="false">View or edit Mail Configuration</h3>
+</header>
+<form id="MailConfigForm" name="MailConfigForm" class="form-horizontal"
+	role="form">
+	<div ng-show="displayError" class="alert alert-danger">
+		<strong>Error!</strong> Something broke. Retry, or cancel and start
+		afresh.
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MailConfigForm.project.$invalid}">
+		<label for="project" class="col-sm-2 control-label">Project</label>
+		<div id='project' class="col-sm-10">
+			<input id="project" name="project" class="form-control" type="text"
+				ng-model="config.project" placeholder="Specify the Project Name"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MailConfigForm.environment.$invalid}">
+		<label for="environment" class="col-sm-2 control-label">Environment</label>
+		<div id="environmentControls" class="col-sm-10">
+			<select id="environment" name="environment" class="form-control"
+				ng-model="environmentSelection">
+				<option value="">Choose an Environment</option>
+				<option value="DEV">DEV-Development</option>
+				<option value="QA">QA-Testing</option>
+				<option value="UAT">UAT-UserAcceptance</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MailConfigForm.buildVersion.$invalid}">
+		<label for="buildVersion" class="col-sm-2 control-label">Build
+			Version</label>
+		<div class="col-sm-10">
+			<input id="buildVersion" name="buildVersion" class="form-control"
+				type="text" ng-model="config.buildVersion"
+				placeholder="Enter the Build Version"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MailConfigForm.mailType.$invalid}">
+		<label for="mailType" class="col-sm-2 control-label">Type Of
+			User/Employee</label>
+		<div id='mailType' class="col-sm-10">
+			<input id="mailType" name="mailType" class="form-control" type="text"
+				ng-model="config.mailType"
+				placeholder="Specify the User/Employee type"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MailConfigForm.mailFrom.$invalid}">
+		<label for="mailFrom" class="col-sm-2 control-label">Mail From</label>
+		<div id='mailFrom' class="col-sm-10">
+			<input id="mailFrom" name="mailFrom" class="form-control" type="email"
+				ng-model="config.mailFrom" placeholder="Specify From Mail Address"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MailConfigForm.mailPassword.$invalid}">
+		<label for="mailPassword" class="col-sm-2 control-label">Mail
+			From Password</label>
+		<div id='mailPassword' class="col-sm-10">
+			<input id="mailPassword" name="mailPassword" class="form-control"
+				type="password" ng-model="config.mailPassword"
+				placeholder="Specify the From Mail Password"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MailConfigForm.mailTo.$invalid}">
+		<label for="mailTo" class="col-sm-2 control-label">Mail To</label>
+		<div id="mailTo" class="col-sm-10">
+			<input id="mailTo" name="mailTo" type="text" class="form-control" ng-model="config.mailTo"
+				placeholder="Specify To Mail Address ',' separated "></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MailConfigForm.mailHost.$invalid}">
+		<label for="mailHost" class="col-sm-2 control-label">Mail Host</label>
+		<div id="mailHost" class="col-sm-10">
+			<input id="mailHost" name="mailHost" type="text" class="form-control" ng-model="config.mailHost"
+				placeholder="Specify the Mailing Host address"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MailConfigForm.mailPort.$invalid}">
+		<label for="mailPort" class="col-sm-2 control-label">Mail Port</label>
+		<div id='mailPort' class="col-sm-10">
+			<input id="mailPort" name="mailPort" class="form-control" type="text"
+				ng-model="config.mailPort" placeholder="Specify the Mailing Port"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': MailConfigForm.mailSubject.$invalid}">
+		<label for="mailSubject" class="col-sm-2 control-label">Mail
+			Subject</label>
+		<div id='mailSubject' class="col-sm-10">
+			<input id="mailSubject" name="mailSubject" class="form-control"
+				type="text" ng-model="config.mailSubject"
+				placeholder="Specify the Mail Subject"></input>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button id="saveMediaItem" name="saveMediaItem"
+				class="btn btn-primary"
+				ng-disabled="isClean() || MailConfigForm.$invalid" ng-click="save()">
+				<span class="glyphicon glyphicon-ok-sign"></span> Save
+			</button>
+			<button id="cancel" name="cancel" class="btn btn-default"
+				ng-click="cancel()">
+				<span class="glyphicon glyphicon-remove-sign"></span> Cancel
+			</button>
+			<button id="deleteMediaItem" name="deleteMediaItem"
+				class="btn btn-danger" ng-show="mediaItem.id" ng-click="remove()">
+				<span class="glyphicon glyphicon-trash"></span> Delete
+			</button>
+		</div>
+	</div>
+</form>

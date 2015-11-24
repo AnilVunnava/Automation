@@ -1,0 +1,636 @@
+<header ng-switch on="$location.path().indexOf('/DataInput/new') > -1">
+	<h3 ng-switch-when="true">Create a new DataInput</h3>
+	<h3 ng-switch-when="false">View or edit DataInput</h3>
+</header>
+<form id="DataInputForm" name="DataInputForm" class="form-horizontal"
+	role="form">
+	<div ng-show="displayError" class="alert alert-danger">
+		<strong>Error!</strong> Something broke. Retry, or cancel and start
+		afresh.
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.project.$invalid}">
+		<label for="project" class="col-sm-2 control-label">Project</label>
+		<div id='project' class="col-sm-10">
+			<input id="project" name="project" class="form-control" type="text"
+				ng-model="config.project" placeholder="Specify the Project Name"
+				required></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.environment.$invalid}">
+		<label for="environment" class="col-sm-2 control-label">Environment</label>
+		<div id="environmentControls" class="col-sm-10">
+			<select id="environment" name="environment" class="form-control"
+				ng-model="environmentSelection" required>
+				<option value="">Choose an Environment</option>
+				<option value="DEV">DEV-Development</option>
+				<option value="QA">QA-Testing</option>
+				<option value="UAT">UAT-UserAcceptance</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.version.$invalid}">
+		<label for="version" class="col-sm-2 control-label">Build
+			Version</label>
+		<div class="col-sm-10">
+			<input id="version" name="version" class="form-control"
+				type="text" ng-model="config.version"
+				placeholder="Enter the Build Version" required></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.scriptName.$invalid}">
+		<label for="scriptName" class="col-sm-2 control-label">Script
+			Name</label>
+		<div id='scriptName' class="col-sm-10">
+			<input id="scriptName" name="scriptName" class="form-control"
+				type="text" ng-model="config.scriptName"
+				placeholder="Specify the Script Name" required></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.empEmail.$invalid}">
+		<label for="empEmail" class="col-sm-2 control-label">Emp Email</label>
+		<div id="empEmail" class="col-sm-10">
+			<input id="empEmail" name="empEmail" type="email"
+				class="form-control" ng-model="config.empEmail"
+				placeholder="Specify Email Address to Login" required></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.empPassword.$invalid}">
+		<label for="empPassword" class="col-sm-2 control-label">Emp
+			Password</label>
+		<div id="empPassword" class="col-sm-10">
+			<input id="empPassword" name="empPassword" type="password"
+				class="form-control" ng-model="config.empPassword"
+				placeholder="Specify Password to Login" required></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.client.$invalid}">
+		<label for="client" class="col-sm-2 control-label">Client</label>
+		<div id="client" class="col-sm-10">
+			<input id="client" name="client" type="text" class="form-control"
+				ng-model="config.client" placeholder="Specify Client Name" required></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.group.$invalid}">
+		<label for="group" class="col-sm-2 control-label">Group</label>
+		<div id="group" class="col-sm-10">
+			<input id="group" name="group" type="text" class="form-control"
+				ng-model="config.group" placeholder="Specify Group Name" required></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.site.$invalid}">
+		<label for="site" class="col-sm-2 control-label">Site</label>
+		<div id="site" class="col-sm-10">
+			<input id="site" name="site" type="text" class="form-control"
+				ng-model="config.site" placeholder="Specify Site Name" required></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.addEmployee.$invalid}">
+		<label for="addEmployee" class="col-sm-2 control-label">Add
+			Employee</label>
+		<div id="addEmployee" class="col-sm-10">
+			<select id="addEmployee" name="addEmployee" class="form-control"
+				ng-model="addEmployeeSelection" required>
+				<option value="">Choose Yes/No</option>
+				<option value="yes">Yes</option>
+				<option value="no">No</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.lastSSN.$invalid}"
+		ng-show="IsVisible">
+		<label for="lastSSN" class="col-sm-2 control-label">Last SSN</label>
+		<div id='lastSSN' class="col-sm-10">
+			<input id="lastSSN" name="lastSSN" class="form-control" type="text"
+				ng-model="config.lastSSN"
+				placeholder="Specify the Last SSN for Employee"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.empId.$invalid}"
+		ng-show="IsVisible">
+		<label for="empId" class="col-sm-2 control-label">Employee ID</label>
+		<div id='empId' class="col-sm-10">
+			<input id="empId" name="empId" class="form-control" type="text"
+				ng-model="config.empId" placeholder="Specify the Employee ID"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.firstName.$invalid}"
+		ng-show="IsVisible">
+		<label for="firstName" class="col-sm-2 control-label">First
+			Name</label>
+		<div id='firstName' class="col-sm-10">
+			<input id="firstName" name="firstName" class="form-control"
+				type="text" ng-model="config.firstName"
+				placeholder="Specify First Name"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.lastName.$invalid}"
+		ng-show="IsVisible">
+		<label for="lastName" class="col-sm-2 control-label">Last Name</label>
+		<div id='lastName' class="col-sm-10">
+			<input id="lastName" name="lastName" class="form-control" type="text"
+				ng-model="config.lastName" placeholder="Specify Last Name"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.apprFirstName.$invalid}"
+		ng-show="IsVisible">
+		<label for="apprFirstName" class="col-sm-2 control-label">Appr
+			FirstName</label>
+		<div id='apprFirstName' class="col-sm-10">
+			<input id="apprFirstName" name="apprFirstName" class="form-control"
+				type="text" ng-model="config.apprFirstName"
+				placeholder="Specify Approver FirstName"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.apprLastName.$invalid}"
+		ng-show="IsVisible">
+		<label for="apprLastName" class="col-sm-2 control-label">Appr
+			LastName</label>
+		<div id='apprLastName' class="col-sm-10">
+			<input id="apprLastName" name="apprLastName" class="form-control"
+				type="text" ng-model="config.apprLastName"
+				placeholder="Specify Approver LastName"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.apprEmail.$invalid}"
+		ng-show="IsVisible">
+		<label for="apprEmail" class="col-sm-2 control-label">Appr
+			Email</label>
+		<div id='apprEmail' class="col-sm-10">
+			<input id="apprEmail" name="apprEmail" class="form-control"
+				type="email" ng-model="config.apprEmail"
+				placeholder="Specify Approver Email"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.empType.$invalid}">
+		<label for="empType" class="col-sm-2 control-label">Employee
+			Type</label>
+		<div id="empType" class="col-sm-10">
+			<select id="empType" name="empType" class="form-control"
+				ng-model="empTypeSelection">
+				<option value="">Choose Employee Type</option>
+				<option value="inout">InOut</option>
+				<option value="hpd">HPD</option>
+				<option value="inout-udf">InOut-UDF</option>
+				<option value="hpd-udf">HPD-UDF</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.inTime.$invalid}"
+		ng-show="InoutVisible">
+		<label for="inTime" class="col-sm-2 control-label">In Time</label>
+		<div id='inTime' class="col-sm-10">
+			<input id="inTime" name="inTime" class="form-control" type="text"
+				ng-model="config.inTime" placeholder="Specify In Time"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.outTime.$invalid}"
+		ng-show="InoutVisible">
+		<label for="outTime" class="col-sm-2 control-label">Out Time</label>
+		<div id='outTime' class="col-sm-10">
+			<input id="outTime" name="outTime" class="form-control" type="text"
+				ng-model="config.outTime" placeholder="Specify Out Time"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.time.$invalid}"
+		ng-show="HpdVisible">
+		<label for="time" class="col-sm-2 control-label">Time</label>
+		<div id='time' class="col-sm-10">
+			<input id="time" name="time" class="form-control" type="text"
+				ng-model="config.time" placeholder="Specify the Time"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.udfValue.$invalid}"
+		ng-show="UdfVisible">
+		<label for="udfValue" class="col-sm-2 control-label">UDF Value</label>
+		<div id='udfValue' class="col-sm-10">
+			<input id="udfValue" name="udfValue" class="form-control" type="text"
+				ng-model="config.udfValue" placeholder="Specify UDF Value"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.processEmployee.$invalid}">
+		<label for="processEmployee" class="col-sm-2 control-label">Process
+			HMY Employee</label>
+		<div id="processEmployee" class="col-sm-10">
+			<select id="processEmployee" name="processEmployee"
+				class="form-control" ng-model="processEmployeeSelection">
+				<option value="">Choose Yes/No to Process HMY Employee</option>
+				<option value="yes">Yes</option>
+				<option value="no">No</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.processEmployee.$invalid}">
+		<label for="processFromTMC" class="col-sm-2 control-label">Process
+			TMC Employee</label>
+		<div id="processFromTMC" class="col-sm-10">
+			<select id="processFromTMC" name="processFromTMC"
+				class="form-control" ng-model="processFromTMCSelection">
+				<option value="">Choose Yes/No to Process TMC Employee</option>
+				<option value="yes">Yes</option>
+				<option value="no">No</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.checkTMC.$invalid}"
+		ng-show="hmyVisible">
+		<label for="checkTMC" class="col-sm-2 control-label">Check TMC</label>
+		<div id='checkTMC' class="col-sm-10">
+			<input id="checkTMC" name="checkTMC" class="form-control"
+				style="width: 10%" type="checkbox" ng-model="config.checkTMC"
+				placeholder="Specify the Time"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.approveFromTMC.$invalid}"
+		ng-show="tmcVisible">
+		<label for="approveFromTMC" class="col-sm-2 control-label">Approve
+			From TMC</label>
+		<div id='approveFromTMC' class="col-sm-10">
+			<input id="approveFromTMC" name="approveFromTMC" class="form-control"
+				style="width: 10%" type="checkbox" ng-model="config.approveFromTMC"
+				placeholder="Approve from TMC"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.deleteFromTMC.$invalid}"
+		ng-show="tmcVisible">
+		<label for="deleteFromTMC" class="col-sm-2 control-label">Delete
+			From TMC</label>
+		<div id='deleteFromTMC' class="col-sm-10">
+			<input id="deleteFromTMC" name="deleteFromTMC" class="form-control"
+				style="width: 10%" type="checkbox" ng-model="config.deleteFromTMC"
+				placeholder="Approve from TMC"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.projectCount.$invalid}"
+		ng-show="hmyVisible">
+		<label for="projectCount" class="col-sm-2 control-label">Project
+			Count</label>
+		<div id='projectCount' class="col-sm-10">
+			<input id="projectCount" name="projectCount" class="form-control"
+				type="text" ng-model="config.projectCount"
+				placeholder="Specify How many Projects you want to Add"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.projectHours.$invalid}"
+		ng-show="hmyProjVisible">
+		<label for="projectHours" class="col-sm-2 control-label">Project
+			Hours</label>
+		<div id='projectHours' class="col-sm-10">
+			<input id="projectHours" name="projectHours" class="form-control"
+				type="text" ng-model="config.projectHours"
+				placeholder="Specify the Project Hours"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.workCount.$invalid}"
+		ng-show="hmyVisible">
+		<label for="workCount" class="col-sm-2 control-label">Work
+			Count</label>
+		<div id='workCount' class="col-sm-10">
+			<input id="workCount" name="workCount" class="form-control"
+				type="text" ng-model="config.workCount"
+				placeholder="Specify How many Work you want to Add"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.breaksCount.$invalid}"
+		ng-show="hmyVisible">
+		<label for="breaksCount" class="col-sm-2 control-label">Breaks
+			Count</label>
+		<div id='breaksCount' class="col-sm-10">
+			<input id="breaksCount" name="breaksCount" class="form-control"
+				type="text" ng-model="config.breaksCount"
+				placeholder="Specify How many Breaks you want to Add"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.addProject.$invalid}"
+		ng-show="hmyVisible">
+		<label for="addProject" class="col-sm-2 control-label">Add
+			Project</label>
+		<div id='addProject' class="col-sm-10">
+			<input id="addProject" name="addProject" class="form-control"
+				style="width: 10%" type="checkbox" ng-model="config.addProject"
+				placeholder="Enable/Disable Adding Projects"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.addAssignments.$invalid}"
+		ng-show="hmyVisible">
+		<label for="addAssignments" class="col-sm-2 control-label">Add
+			Assignments</label>
+		<div id='addAssignments' class="col-sm-10">
+			<input id="addAssignments" name="addAssignments" class="form-control"
+				style="width: 10%" type="checkbox" ng-model="config.addAssignments"
+				placeholder="Enable/Disable Adding Assignments"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.deleteAssignments.$invalid}"
+		ng-show="hmyVisible">
+		<label for="deleteAssignments" class="col-sm-2 control-label">Delete
+			Assignments</label>
+		<div id='deleteAssignments' class="col-sm-10">
+			<input id="deleteAssignments" name="deleteAssignments"
+				class="form-control" style="width: 10%" type="checkbox"
+				ng-model="config.deleteAssignments"
+				placeholder="Enable/Disable Delete Assignments"></input>
+		</div>
+	</div>
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.assignmentName.$invalid}"
+		ng-show="hmyVisible">
+		<label for="assignmentName" class="col-sm-2 control-label">Assignment
+			Name</label>
+		<div id='assignmentName' class="col-sm-10">
+			<input id="assignmentName" name="assignmentName" class="form-control"
+				type="text" ng-model="config.assignmentName"
+				placeholder="Specify the Assignment Name"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.addComment.$invalid}"
+		ng-show="hmyVisible">
+		<label for="addComment" class="col-sm-2 control-label">Add
+			Comment</label>
+		<div id='addComment' class="col-sm-10">
+			<input id="addComment" name="addComment" class="form-control"
+				style="width: 10%" type="checkbox" ng-model="config.addComment"
+				placeholder="Enable/Disable Adding Comments"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.addAttachment.$invalid}"
+		ng-show="hmyVisible">
+		<label for="addAttachment" class="col-sm-2 control-label">Add
+			Attachments</label>
+		<div id='addAttachment' class="col-sm-10">
+			<input id="addAttachment" name="addAttachment" class="form-control"
+				style="width: 10%" type="checkbox" ng-model="config.addAttachment"
+				placeholder="Enable/Disable Adding Attachments"></input>
+		</div>
+	</div>
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.showOT.$invalid}"
+		ng-show="hmyVisible">
+		<label for="showOT" class="col-sm-2 control-label">Verify OT
+			Validation</label>
+		<div id='showOT' class="col-sm-10">
+			<input id="showOT" name="showOT" class="form-control"
+				style="width: 10%" type="checkbox" ng-model="config.showOT"
+				placeholder="Enable/Disable Show OT Validation"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.timeEntryMethod.$invalid}"
+		ng-show="hmyVisible">
+		<label for="timeEntryMethod" class="col-sm-2 control-label">TimeEntry
+			Method</label>
+		<div id="timeEntryMethod" class="col-sm-10">
+			<select id="timeEntryMethod" name="timeEntryMethod"
+				class="form-control" ng-model="timeEntryMethodSelection">
+				<option value="">Choose TimeEntry Type</option>
+				<option value="Ok">OK</option>
+				<option value="Copy to Next Day">Copy to Next Day</option>
+				<option value="Copy through Friday">Copy through Friday</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.action.$invalid}"
+		ng-show="hmyVisible">
+		<label for="action" class="col-sm-2 control-label">Submit
+			Method</label>
+		<div id="action" class="col-sm-10">
+			<select id="action" name="action" class="form-control"
+				ng-model="actionSelection">
+				<option value="">Choose Time Submittion</option>
+				<option value="Submit">Submit</option>
+				<option value="Submit All">Submit All</option>
+			</select>
+		</div>
+	</div>
+
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.addWebClient.$invalid}"
+		ng-show="tmcConfVisible">
+		<label for="addWebClient" class="col-sm-2 control-label">Add
+			WebClient</label>
+		<div id="addWebClient" class="col-sm-10">
+			<select id="addWebClient" name="addWebClient" class="form-control"
+				ng-model="addWebClientSelection">
+				<option value="">Choose Yes/No to Add WebClient</option>
+				<option value="yes">Yes</option>
+				<option value="no">No</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.ClientCode.$invalid}"
+		ng-show="tmcClientConfVisible">
+		<label for="ClientCode" class="col-sm-2 control-label">Client
+			Code</label>
+		<div id='ClientCode' class="col-sm-10">
+			<input id="ClientCode" name="ClientCode" class="form-control"
+				type="text" ng-model="config.ClientCode"
+				placeholder="Specify Client Code to Add"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.ClientName.$invalid}"
+		ng-show="tmcClientConfVisible">
+		<label for="ClientName" class="col-sm-2 control-label">Client
+			Name</label>
+		<div id='ClientName' class="col-sm-10">
+			<input id="ClientName" name="ClientName" class="form-control"
+				type="text" ng-model="config.ClientName"
+				placeholder="Specify Client Name to Add"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.addBranch.$invalid}"
+		ng-show="tmcConfVisible">
+		<label for="addBranch" class="col-sm-2 control-label">Add
+			Group</label>
+		<div id="addBranch" class="col-sm-10">
+			<select id="addBranch" name="addBranch" class="form-control"
+				ng-model="addBranchSelection">
+				<option value="">Choose Yes/No to Add Group</option>
+				<option value="yes">Yes</option>
+				<option value="no">No</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.GroupCode.$invalid}"
+		ng-show="tmcGroupConfVisible">
+		<label for="GroupCode" class="col-sm-2 control-label">Group
+			Code</label>
+		<div id='GroupCode' class="col-sm-10">
+			<input id="GroupCode" name="GroupCode" class="form-control"
+				type="text" ng-model="config.GroupCode"
+				placeholder="Specify Group Code to Add"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.GroupName.$invalid}"
+		ng-show="tmcGroupConfVisible">
+		<label for="GroupName" class="col-sm-2 control-label">Group
+			Name</label>
+		<div id='GroupName' class="col-sm-10">
+			<input id="GroupName" name="GroupName" class="form-control"
+				type="text" ng-model="config.GroupName"
+				placeholder="Specify Group Name to Add"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.WeeklyHQ.$invalid}"
+		ng-show="tmcGroupConfVisible">
+		<label for="WeeklyHQ" class="col-sm-2 control-label">WeeklyHQ</label>
+		<div id='WeeklyHQ' class="col-sm-10">
+			<input id="WeeklyHQ" name="WeeklyHQ" class="form-control" type="text"
+				ng-model="config.WeeklyHQ"
+				placeholder="Specify WeeklyHQ for Group to Add"></input>
+		</div>
+	</div>
+
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.menuFunction.$invalid}"
+		ng-show="tmcConfVisible">
+		<label for="menuFunction" class="col-sm-2 control-label">Menu
+			Function</label>
+		<div id="menuFunction" class="col-sm-10">
+			<input id="menuFunction" name="menuFunction" class="form-control"
+				type="text" ng-model="config.menuFunction"
+				placeholder="Specify Menu Function to Perform"></input>
+		</div>
+	</div>
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.menuFunction.$invalid}"
+		ng-show="tmcConfVisible">
+		<label for="menuAction" class="col-sm-2 control-label">Menu
+			Action</label>
+		<div id="menuAction" class="col-sm-10">
+			<input id="menuAction" name="menuAction" class="form-control"
+				type="text" ng-model="config.menuAction"
+				placeholder="Specify Menu Action to Perform"></input>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.addRole.$invalid}"
+		ng-show="tmcConfVisible">
+		<label for="addRole" class="col-sm-2 control-label">Add Role</label>
+		<div id="addRole" class="col-sm-10">
+			<select id="addRole" name="addRole" class="form-control"
+				ng-model="addRoleSelection">
+				<option value="">Choose Yes/No to Add Role</option>
+				<option value="yes">Yes</option>
+				<option value="no">No</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group"
+		ng-class="{'has-error': DataInputForm.roleName.$invalid}"
+		ng-show="tmcRoleConfVisible">
+		<label for="roleName" class="col-sm-2 control-label">Role Name</label>
+		<div id='roleName' class="col-sm-10">
+			<input id="roleName" name="roleName" class="form-control" type="text"
+				ng-model="config.roleName"
+				placeholder="Specify Rollname to Add"></input>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button id="saveDataInput" name="saveDataInput"
+				class="btn btn-primary"
+				ng-disabled="isClean() || DataInputForm.$invalid" ng-click="save()">
+				<span class="glyphicon glyphicon-ok-sign"></span> Save
+			</button>
+			<button id="cancel" name="cancel" class="btn btn-default"
+				ng-click="cancel()">
+				<span class="glyphicon glyphicon-remove-sign"></span> Cancel
+			</button>
+			<button id="deleteDataInput" name="deleteDataInput"
+				class="btn btn-danger" ng-show="DataInput.id" ng-click="remove()">
+				<span class="glyphicon glyphicon-trash"></span> Delete
+			</button>
+		</div>
+	</div>
+</form>

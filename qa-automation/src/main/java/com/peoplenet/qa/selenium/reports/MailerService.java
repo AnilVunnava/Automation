@@ -88,6 +88,9 @@ public class MailerService {
 			Template t = velocityEngine.getTemplate("reports/mail-report.vm");
 			VelocityContext context = new VelocityContext();
 			context.put("count", SeleniumDriverFactory.getSuiteConfig().size());
+			context.put("functionality",
+					PropertiesLoader.getProperty("functionality"));
+			context.put("scenarios", PropertiesLoader.getProperty("scenarios"));
 			context.put("mailBody", getMailBodyHtml());
 			StringWriter writer = new StringWriter();
 			t.merge(context, writer);
@@ -97,7 +100,10 @@ public class MailerService {
 			MimeMessage message = new MimeMessage(session);
 			message.addRecipients(Message.RecipientType.TO,
 					InternetAddress.parse(to));
-			message.setSubject(PropertiesLoader.getProperty("mailSubject"));
+			message.setSubject(PropertiesLoader.getProperty("mailSubject")
+					+ " ["
+					+ new SimpleDateFormat("yyyy-MM-dd-HH-mm")
+							.format(new Date()) + "]");
 			FileDataSource fds = new FileDataSource(filename);
 			mbp2.setDataHandler(new DataHandler(fds));
 			mbp2.setFileName(fds.getName());
@@ -137,7 +143,11 @@ public class MailerService {
 			mailCnt.put("passed", passCount);
 			mailCnt.put("failed", failCount);
 			mailCnt.put("skipped", skipCount);
-			mailBody.put(entry, mailCnt);
+			mailCnt.put("total", passCount + failCount + skipCount);
+			if (entry.equals("FLOW"))
+				mailBody.put("HMY", mailCnt);
+			else
+				mailBody.put(entry, mailCnt);
 		}
 		for (Entry<String, Map<String, Integer>> key : mailBody.entrySet()) {
 			String content = "<tr>"
@@ -152,7 +162,10 @@ public class MailerService {
 					+ key.getValue().get("failed")
 					+ "</td>"
 					+ "<td style=\"padding: 8px;text-align: center;border: 1px solid black;border-collapse: collapse;\">"
-					+ key.getValue().get("skipped") + "</td>" + "</tr>";
+					+ key.getValue().get("skipped")
+					+ "</td>"
+					+ "<td style=\"padding: 8px;text-align: center;border: 1px solid black;border-collapse: collapse;\">"
+					+ key.getValue().get("total") + "</td>" + "</tr>";
 			finalContent += content;
 		}
 		return finalContent;
@@ -169,6 +182,7 @@ public class MailerService {
 		try {
 			File file = new File(reportDir);
 			log.info("Files To be Zipped under : " + file.getAbsolutePath());
+			fileList.clear();
 			generateFileList(file, file.getAbsolutePath());
 			zipIt(reportZip, file.getAbsolutePath());
 			Thread.sleep(1000);
